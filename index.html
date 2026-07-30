@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Friendship Day, Subi 💌</title>
+<style>
+  :root{
+    --cream:#F0FDFF;
+    --blush:#DFF9FD;
+    --blush-deep:#8CE9F5;
+    --rose:#29DCF0;
+    --lavender:#B9D4FF;
+    --gold:#F2B84B;
+    --ink:#1F3A44;
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    width:100%;
+    overflow-x:hidden;
+    background:linear-gradient(160deg, var(--cream) 0%, #DEFAFF 45%, #E7F9FF 100%);
+    font-family:'Quicksand', sans-serif;
+    color:var(--ink);
+  }
+
+  @font-face{
+    font-family:'Caveat';
+    src:local('Caveat');
+  }
+
+  #hearts-canvas{
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    pointer-events:none;
+    z-index:1;
+  }
+
+  .heart{
+    position:absolute;
+    bottom:-40px;
+    opacity:0.85;
+    animation-name:floatUp;
+    animation-timing-function:ease-in;
+    animation-iteration-count:1;
+    will-change:transform, opacity;
+  }
+
+  @keyframes floatUp{
+    0%{ transform:translateY(0) translateX(0) rotate(0deg); opacity:0; }
+    10%{ opacity:0.9; }
+    100%{ transform:translateY(-115vh) translateX(var(--drift, 30px)) rotate(20deg); opacity:0; }
+  }
+
+  .stage{
+    position:relative;
+    z-index:2;
+    min-height:100vh;
+    min-height:100dvh;
+    display:grid;
+    place-items:center;
+    padding:24px;
+  }
+
+  .letter{
+    grid-column:1;
+    grid-row:1;
+  }
+
+  .envelope-mover{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    transition:transform .5s cubic-bezier(.34,1.56,.64,1);
+    z-index:5;
+  }
+
+  .tap-hint{
+    min-width:220px;
+    text-align:center;
+  }
+
+  /* ENVELOPE */
+  .envelope-wrap{
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:22px;
+    transition:transform .4s ease, opacity .5s ease;
+  }
+
+  .envelope-wrap.hidden{
+    transform:scale(0.85);
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .envelope{
+    position:relative;
+    width:280px;
+    height:190px;
+    background:linear-gradient(135deg, #FFFFFF, #FFEFF5);
+    border-radius:10px;
+    box-shadow:0 18px 40px rgba(41,220,240,0.28), 0 2px 8px rgba(41,220,240,0.18);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .envelope::before{
+    /* bottom triangle flap shading */
+    content:"";
+    position:absolute;
+    top:0; left:0;
+    width:0; height:0;
+    border-left:140px solid transparent;
+    border-right:140px solid transparent;
+    border-top:95px solid #D2F6FC;
+    border-radius:0 0 10px 10px;
+    z-index:1;
+  }
+
+  .flap{
+    position:absolute;
+    top:0; left:0;
+    width:0; height:0;
+    border-left:140px solid transparent;
+    border-right:140px solid transparent;
+    border-top:95px solid var(--blush-deep);
+    transform-origin:top center;
+    transition:transform .7s cubic-bezier(.6,-0.28,.74,.05);
+    z-index:3;
+    border-radius:0 0 6px 6px;
+  }
+
+  .envelope-wrap.open .flap{
+    transform:rotateX(180deg);
+  }
+
+  .seal{
+    position:absolute;
+    top:78px;
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, var(--rose), #0B93A3);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Georgia', serif;
+    font-size:26px;
+    font-weight:bold;
+    z-index:4;
+    box-shadow:0 4px 10px rgba(11,147,163,0.45);
+    transition:transform .4s ease, opacity .4s ease;
+  }
+
+  .envelope-wrap.open .seal{
+    transform:scale(0) rotate(180deg);
+    opacity:0;
+  }
+
+  .tap-hint{
+    font-size:1.05rem;
+    color:var(--rose);
+    letter-spacing:.5px;
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes pulse{
+    0%,100%{opacity:.55;}
+    50%{opacity:1;}
+  }
+
+  /* LETTER */
+  .letter{
+    max-width:640px;
+    width:100%;
+    background:rgba(255,255,255,0.75);
+    backdrop-filter:blur(6px);
+    border-radius:22px;
+    padding:52px 42px 44px;
+    box-shadow:0 30px 60px rgba(41,220,240,0.22);
+    text-align:center;
+    opacity:0;
+    transform:translateY(30px) scale(.97);
+    transition:opacity .9s ease, transform .9s ease;
+    border:1px solid rgba(255,255,255,0.6);
+  }
+
+  .letter.show{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:3px;
+    font-size:.72rem;
+    color:var(--rose);
+    font-weight:700;
+    margin-bottom:10px;
+  }
+
+  .headline{
+    font-family:'Caveat', 'Brush Script MT', cursive;
+    font-size:3.4rem;
+    line-height:1.05;
+    color:var(--rose);
+    margin:0 0 22px;
+  }
+
+  .body-text{
+    font-size:1.08rem;
+    line-height:1.85;
+    color:var(--ink);
+    margin:0 auto 26px;
+    max-width:520px;
+    font-weight:500;
+  }
+
+  .signoff{
+    font-family:'Caveat', cursive;
+    font-size:2rem;
+    color:var(--rose);
+    margin-top:10px;
+  }
+
+  .music-controls{
+    margin-top:28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+  }
+
+  .music-btn{
+    border:none;
+    background:var(--rose);
+    color:#fff;
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    font-size:1.2rem;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 8px 18px rgba(41,220,240,0.4);
+    transition:transform .2s ease;
+  }
+  .music-btn:hover{ transform:scale(1.08); }
+
+  .music-label{
+    font-size:.85rem;
+    color:var(--ink);
+    opacity:.75;
+  }
+
+  .divider{
+    width:70px;
+    height:3px;
+    border-radius:2px;
+    background:linear-gradient(90deg, var(--rose), var(--gold));
+    margin:22px auto;
+  }
+
+  @media (max-width:480px){
+    .headline{ font-size:2.6rem; }
+    .letter{ padding:38px 24px 34px; }
+    .envelope{ width:230px; height:158px; }
+    .envelope::before,.flap{
+      border-left-width:115px;
+      border-right-width:115px;
+      border-top-width:78px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .heart{ animation:none; display:none; }
+    .flap{ transition:none; }
+    .letter{ transition:opacity .3s ease; }
+  }
+</style>
+</head>
+<body>
+
+<div id="hearts-canvas"></div>
+
+<div class="stage">
+
+  <div class="envelope-mover" id="envelopeMover">
+    <div class="envelope-wrap" id="envelopeWrap">
+      <div class="envelope">
+        <div class="flap"></div>
+        <div class="seal">S</div>
+      </div>
+      <div class="tap-hint" id="tapHint">tap the envelope, Subi 💌</div>
+    </div>
+  </div>
+
+  <div class="letter" id="letter">
+    <div class="eyebrow">Friendship Day</div>
+    <h1 class="headline">Happy Friendship Day, Subi!</h1>
+    <div class="divider"></div>
+    <p class="body-text">
+      Happy Friendship Day to the person who puts up with my terrible jokes 😂, worse
+      singing 🎤, and even worse dance moves 💃 — and somehow still chooses to hang
+      around. You're my favorite chaos ✨, my go-to for both emotional breakdowns and
+      food recommendations 🍔, and honestly the best part of my day, every day 🫂.
+    </p>
+    <p class="body-text">
+      No matter how busy life gets or how far apart we are 🌍, there's always something
+      that reminds me of you. Some people become a part of your routine, but you became
+      a part of my heart 💙. I miss our random conversations, our endless laughter 😆,
+      and all those little moments that never felt little.
+    </p>
+    <p class="body-text">
+      Just knowing you're there makes even the hardest days a little easier 🤗. Thank
+      you for being my safe place, my biggest supporter 🙌, and the friend I can always
+      count on. Life would be a lot less fun without you.
+    </p>
+    <p class="body-text">
+      Thanks for being you. I promise to keep making questionable memes just for you. 💛
+    </p>
+    <p class="body-text">
+      Happy Friendship Day! Here's to many more memories 📸, endless laughter, and a
+      friendship that only gets stronger with time. Love you, my friend. 🤍
+    </p>
+  </div>
+
+</div>
+
+<audio id="bgAudio" src="song.mp3" preload="auto" loop></audio>
+
+<script>
+  const envelopeMover = document.getElementById('envelopeMover');
+  const envelopeWrap = document.getElementById('envelopeWrap');
+  const tapHint = document.getElementById('tapHint');
+  const stage = document.querySelector('.stage');
+  const letter = document.getElementById('letter');
+  const heartsCanvas = document.getElementById('hearts-canvas');
+  const audio = document.getElementById('bgAudio');
+
+  function startMusic(){
+    audio.play().catch(() => {
+      // if a browser blocks it, try once more on the next tap anywhere
+      document.addEventListener('click', () => audio.play(), { once: true });
+    });
+  }
+
+  const heartEmojis = ['💙','💠','🩵','✨','💫'];
+
+  function spawnHeart(){
+    const h = document.createElement('div');
+    h.className = 'heart';
+    h.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+    const size = 14 + Math.random()*22;
+    h.style.fontSize = size + 'px';
+    h.style.left = Math.random()*100 + 'vw';
+    h.style.setProperty('--drift', (Math.random()*80-40) + 'px');
+    const duration = 6 + Math.random()*6;
+    h.style.animationDuration = duration + 's';
+    heartsCanvas.appendChild(h);
+    setTimeout(()=> h.remove(), duration*1000 + 200);
+  }
+
+  // gentle ambient hearts from the start
+  let ambientInterval = setInterval(spawnHeart, 900);
+
+  function burstHearts(count){
+    for(let i=0;i<count;i++){
+      setTimeout(spawnHeart, i*70);
+    }
+  }
+
+  let opened = false;
+  let attempts = 0;
+  const requiredCatches = 4; // how many times it dodges before she can finally catch it
+
+  const dodgeMessages = [
+    "nope, try again 😝",
+    "catch me if you can!",
+    "so close!",
+    "almost had it!",
+    "keep going, Subi!"
+  ];
+
+  function moveEnvelope(big){
+    const rect = stage.getBoundingClientRect();
+    const marginX = 170; // half envelope width + buffer
+    const marginY = 140; // half envelope height + buffer
+    const maxX = Math.max(rect.width/2 - marginX, 30);
+    const maxY = Math.max(rect.height/2 - marginY, 30);
+    const range = big ? 1 : 0.55; // idle wander moves less than a dodge
+    const dx = (Math.random()*2 - 1) * maxX * range;
+    const dy = (Math.random()*2 - 1) * maxY * range;
+    envelopeMover.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+  }
+
+  // idle wander so the envelope feels alive even before she tries to tap it
+  let idleWander = setInterval(() => moveEnvelope(false), 2600);
+
+  envelopeWrap.addEventListener('click', () => {
+    if(opened) return;
+
+    if(attempts < requiredCatches){
+      attempts++;
+      moveEnvelope(true);
+      tapHint.textContent = dodgeMessages[(attempts - 1) % dodgeMessages.length];
+      return;
+    }
+
+    opened = true;
+    clearInterval(idleWander);
+    envelopeMover.style.transform = 'translate(-50%, -50%)';
+
+    envelopeWrap.classList.add('open');
+    burstHearts(18);
+
+    setTimeout(() => {
+      envelopeWrap.classList.add('hidden');
+      letter.classList.add('show');
+    }, 650);
+
+    // this click is a real user gesture, so it unlocks autoplay with sound
+    startMusic();
+  });
+</script>
+
+</body>
+</html>
