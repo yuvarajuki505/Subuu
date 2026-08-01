@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Girlfriend Day 💕</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #073b44 0%, #0e6e7c 45%, #14939f 75%, #0a4f59 100%);
+    background-size: 220% 220%;
+    animation: gradientShift 10s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* ---------- Couple Illustration (background, transparent) ---------- */
+  #coupleWrap {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  #coupleSvg {
+    width: min(80vw, 440px);
+    height: auto;
+    opacity: 0.5;
+  }
+
+  #coupleSvg .figure-part {
+    fill: rgba(255, 255, 255, 0.55);
+    transition: fill 1.4s ease;
+  }
+
+  #coupleSvg .held-hands {
+    stroke: rgba(255, 255, 255, 0.55);
+    transition: stroke 1.4s ease;
+  }
+
+  #coupleWrap.lit #coupleSvg {
+    opacity: 0.95;
+  }
+
+  #coupleWrap.lit .figure-part {
+    fill: #f4c15a;
+  }
+
+  #coupleWrap.lit .held-hands {
+    stroke: #f4c15a;
+  }
+
+  /* ---------- Celebration Emojis ---------- */
+  #emoji-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 3;
+  }
+
+  .celebration-emoji {
+    position: absolute;
+    font-size: 3.5rem;
+    opacity: 0.35;
+    animation: float-emoji linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes float-emoji {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-100vh) rotate(360deg);
+    }
+  }
+
+  /* ---------- Confetti ---------- */
+  #confetti-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 5;
+  }
+
+  .confetti-piece {
+    position: absolute;
+    top: -20px;
+    opacity: 0.95;
+    will-change: transform, opacity;
+    animation-name: confettiFall;
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes confettiFall {
+    0% {
+      transform: translate(0, -20px) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(var(--drift), 110vh) rotate(var(--spin));
+      opacity: 0;
+    }
+  }
+
+  .stage {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* ---------- Tap Screen ---------- */
+  #tapScreen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #tapScreen.hidden {
+    opacity: 0;
+    transform: scale(1.15);
+    pointer-events: none;
+  }
+
+  .popper {
+    font-size: 90px;
+    animation: wiggle 1.6s ease-in-out infinite;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+  }
+
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-8deg) scale(1); }
+    50% { transform: rotate(8deg) scale(1.08); }
+  }
+
+  .tap-text {
+    margin-top: 24px;
+    font-size: 1.3rem;
+    color: #eaf7f8;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-align: center;
+    padding: 0 20px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  }
+
+  .tap-sub {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: #cdeef1;
+    opacity: 0.9;
+    text-align: center;
+    padding: 0 30px;
+  }
+
+  .pulse-ring {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.55);
+    animation: pulse 2s ease-out infinite;
+    z-index: -1;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(2.4); opacity: 0; }
+  }
+
+  /* ---------- Message Screen ---------- */
+  #messageScreen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 8;
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: opacity 0.9s ease 0.3s, transform 0.9s ease 0.3s;
+    padding: 24px;
+  }
+
+  #messageScreen.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 28px;
+    padding: 44px 34px;
+    max-width: 480px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(4, 40, 46, 0.4);
+    border: 1px solid rgba(255,255,255,0.6);
+    position: relative;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #0e6e7c;
+    font-weight: 700;
+    background: #e3f6f7;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+  }
+
+  .headline {
+    font-size: 1.6rem;
+    color: #0a3d47;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 14px;
+  }
+
+  .subline {
+    font-size: 1.05rem;
+    color: #14636f;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  .hearts {
+    margin-top: 22px;
+    font-size: 1.6rem;
+    letter-spacing: 6px;
+  }
+
+  .float-heart {
+    position: fixed;
+    bottom: -40px;
+    font-size: 1.4rem;
+    z-index: 6;
+    animation: floatUp linear forwards;
+    pointer-events: none;
+  }
+
+  @keyframes floatUp {
+    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-110vh) translateX(var(--drift)) rotate(360deg); opacity: 0; }
+  }
+
+  @media (max-width: 480px) {
+    .popper { font-size: 70px; }
+    .headline { font-size: 1.35rem; }
+    .subline { font-size: 0.95rem; }
+    .card { padding: 34px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Celebration emojis (champagne, toasts) floating in background -->
+<div id="emoji-layer"></div>
+
+<!-- Boy & girl holding hands — transparent vector illustration, lights up gold against the peacock blue backdrop on tap -->
+<div id="coupleWrap">
+  <svg id="coupleSvg" viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
+    <!-- Boy -->
+    <g>
+      <path class="figure-part" d="M150,50
+        c14,0 24,10 24,24
+        c0,9 -4,16 -10,20
+        c10,4 17,13 19,26
+        l6,70
+        c1,10 -8,18 -18,18
+        l-42,0
+        c-10,0 -19,-8 -18,-18
+        l6,-70
+        c2,-13 9,-22 19,-26
+        c-6,-4 -10,-11 -10,-20
+        c0,-14 10,-24 24,-24 Z"/>
+      <path class="figure-part" d="M119,208 l-4,54 c-1,8 6,14 13,12 l6,-2 c5,-2 8,-7 8,-12 l1,-52 Z"/>
+      <path class="figure-part" d="M181,208 l4,54 c1,8 -6,14 -13,12 l-6,-2 c-5,-2 -8,-7 -8,-12 l-1,-52 Z"/>
+      <path class="figure-part" d="M176,128 c10,4 17,13 19,26 l4,44 c1,7 -5,13 -12,12 c-5,-1 -9,-5 -10,-11 l-8,-40 Z"/>
+    </g>
+
+    <!-- Girl -->
+    <g>
+      <path class="figure-part" d="M250,48
+        c13,0 23,10 23,23
+        c0,8 -3,15 -9,19
+        c16,6 27,20 30,38
+        l8,58
+        c2,12 -8,22 -20,22
+        l-64,0
+        c-12,0 -22,-10 -20,-22
+        l8,-58
+        c3,-18 14,-32 30,-38
+        c-6,-4 -9,-11 -9,-19
+        c0,-13 10,-23 23,-23 Z"/>
+      <path class="figure-part" d="M224,126 c-14,6 -24,18 -28,33 l-6,36 c-1,7 5,13 12,12 c5,-1 9,-5 10,-11 l7,-34 Z"/>
+    </g>
+
+    <!-- Held hands -->
+    <path class="held-hands" d="M183,146 Q200,166 217,146" fill="none" stroke-width="8" stroke-linecap="round"/>
+  </svg>
+</div>
+
+<div id="confetti-layer"></div>
+
+<div class="stage">
+
+  <div id="tapScreen">
+    <div style="position:relative; display:flex; align-items:center; justify-content:center;">
+      <div class="pulse-ring"></div>
+      <div class="popper">🎉</div>
+    </div>
+    <div class="tap-text">Tap the party popper</div>
+    <div class="tap-sub">A little something is waiting for you...</div>
+  </div>
+
+  <div id="messageScreen">
+    <div class="card">
+      <div class="badge">Officially Announcing</div>
+      <div class="headline">You're still my favorite notification.</div>
+      <div class="subline">Happy Girlfriend Day to my Girl, my meme buddy, and my person 💕</div>
+      <div class="hearts">💕 🎉 💕</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  var tapScreen = document.getElementById('tapScreen');
+  var messageScreen = document.getElementById('messageScreen');
+  var confettiLayer = document.getElementById('confetti-layer');
+  var emojiLayer = document.getElementById('emoji-layer');
+  var coupleWrap = document.getElementById('coupleWrap');
+  var fired = false;
+
+  var confettiColors = ['#f4c15a', '#ffffff', '#a6e3ea', '#5fc9d6', '#ffd98e', '#e8fbfc'];
+  var confettiShapes = ['square', 'circle', 'rect'];
+  var celebrationEmojis = ['🥂', '🍾', '🥂', '🍾', '🎊', '✨'];
+
+  /* ---------------- Celebration Emojis (background) ---------------- */
+  function spawnCelebrationEmojis(count) {
+    for (var e = 0; e < count; e++) {
+      (function () {
+        var emoji = document.createElement('div');
+        emoji.className = 'celebration-emoji';
+        emoji.textContent = celebrationEmojis[Math.floor(Math.random() * celebrationEmojis.length)];
+        
+        var startX = Math.random() * 100;
+        var duration = 4 + Math.random() * 3;
+        var delay = Math.random() * 0.8;
+        
+        emoji.style.left = startX + 'vw';
+        emoji.style.bottom = '-120px';
+        emoji.style.animationDuration = duration + 's';
+        emoji.style.animationDelay = delay + 's';
+        emoji.style.animationFillMode = 'forwards';
+        
+        emojiLayer.appendChild(emoji);
+        
+        setTimeout(function () {
+          emoji.remove();
+        }, (duration + delay) * 1000 + 300);
+      })();
+    }
+  }
+
+  /* Spawn initial background emojis continuously */
+  function startContinuousEmojis() {
+    setInterval(function () {
+      if (!fired) {
+        spawnCelebrationEmojis(2);
+      }
+    }, 1200);
+  }
+
+  /* Call on page load */
+  startContinuousEmojis();
+
+  /* ---------------- Confetti ---------------- */
+  function makeConfettiPiece() {
+    var piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+
+    var shape = confettiShapes[Math.floor(Math.random() * confettiShapes.length)];
+    var size = 6 + Math.random() * 8;
+    var color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.width = size + 'px';
+    piece.style.height = (shape === 'rect' ? size * 1.8 : size) + 'px';
+    piece.style.background = color;
+    piece.style.borderRadius = shape === 'circle' ? '50%' : '2px';
+
+    var drift = (Math.random() * 200 - 100) + 'px';
+    var spin = (Math.random() * 720 - 360) + 'deg';
+    var duration = 2.4 + Math.random() * 1.8;
+    var delay = Math.random() * 0.3;
+
+    piece.style.setProperty('--drift', drift);
+    piece.style.setProperty('--spin', spin);
+    piece.style.animationDuration = duration + 's';
+    piece.style.animationDelay = delay + 's';
+
+    confettiLayer.appendChild(piece);
+
+    setTimeout(function () {
+      piece.remove();
+    }, (duration + delay) * 1000 + 200);
+  }
+
+  function burstConfetti() {
+    for (var i = 0; i < 90; i++) makeConfettiPiece();
+
+    setTimeout(function () {
+      for (var i = 0; i < 50; i++) makeConfettiPiece();
+    }, 300);
+
+    setTimeout(function () {
+      for (var i = 0; i < 40; i++) makeConfettiPiece();
+    }, 700);
+
+    spawnFloatingHearts();
+  }
+
+  function spawnFloatingHearts() {
+    var heartEmojis = ['💕', '💖', '💗', '💝', '❤️'];
+    for (var i = 0; i < 16; i++) {
+      (function (idx) {
+        setTimeout(function () {
+          var heart = document.createElement('div');
+          heart.className = 'float-heart';
+          heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+          heart.style.left = Math.random() * 100 + 'vw';
+          heart.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
+          heart.style.animationDuration = (4 + Math.random() * 3) + 's';
+          document.body.appendChild(heart);
+          setTimeout(function () { heart.remove(); }, 8000);
+        }, idx * 150);
+      })(i);
+    }
+  }
+
+  /* ---------------- Synthesized audio: pop burst + crowd cheer (no external files) ---------------- */
+  function playCelebrationSound() {
+    try {
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      var ctx = new AudioCtx();
+      var now = ctx.currentTime;
+
+      /* ---- Party popper "pop" burst ---- */
+      var bufferSize = ctx.sampleRate * 0.35;
+      var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      var data = buffer.getChannelData(0);
+      for (var i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+      }
+      var noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      var bandpass = ctx.createBiquadFilter();
+      bandpass.type = 'bandpass';
+      bandpass.frequency.value = 1400;
+      bandpass.Q.value = 0.7;
+
+      var noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.9, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+      noise.connect(bandpass);
+      bandpass.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+      noise.start();
+
+      var osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(900, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + 0.14);
+
+      var oscGain = ctx.createGain();
+      oscGain.gain.setValueAtTime(0.55, now);
+      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+      osc.connect(oscGain);
+      oscGain.connect(ctx.destination);
+      osc.start();
+      osc.stop(now + 0.16);
+
+      /* ---- Confetti crackle clicks ---- */
+      for (var c = 0; c < 10; c++) {
+        (function (delay) {
+          setTimeout(function () {
+            var clickBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.03), ctx.sampleRate);
+            var cd = clickBuf.getChannelData(0);
+            for (var j = 0; j < cd.length; j++) {
+              cd[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / cd.length, 3);
+            }
+            var clickSrc = ctx.createBufferSource();
+            clickSrc.buffer = clickBuf;
+            var clickGain = ctx.createGain();
+            clickGain.gain.value = 0.13;
+            clickSrc.connect(clickGain);
+            clickGain.connect(ctx.destination);
+            clickSrc.start();
+          }, delay);
+        })(150 + Math.random() * 950);
+      }
+
+      /* ---- Crowd applause: dense layer of tiny noise claps ---- */
+      var applauseStart = now + 0.05;
+      var applauseDuration = 2.2;
+      var clapMaster = ctx.createGain();
+      clapMaster.gain.setValueAtTime(0.0001, applauseStart);
+      clapMaster.gain.exponentialRampToValueAtTime(0.75, applauseStart + 0.25);
+      clapMaster.gain.exponentialRampToValueAtTime(0.60, applauseStart + 1.2);
+      clapMaster.gain.exponentialRampToValueAtTime(0.0001, applauseStart + applauseDuration);
+      clapMaster.connect(ctx.destination);
+
+      var applauseFilter = ctx.createBiquadFilter();
+      applauseFilter.type = 'bandpass';
+      applauseFilter.frequency.value = 2600;
+      applauseFilter.Q.value = 0.5;
+      applauseFilter.connect(clapMaster);
+
+      var clapCount = 140;
+      for (var k = 0; k < clapCount; k++) {
+        (function () {
+          var t = applauseStart + Math.random() * applauseDuration;
+          var dur = 0.02 + Math.random() * 0.03;
+          var cbuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+          var cdata = cbuf.getChannelData(0);
+          for (var n = 0; n < cdata.length; n++) {
+            cdata[n] = (Math.random() * 2 - 1) * Math.pow(1 - n / cdata.length, 1.5);
+          }
+          var src = ctx.createBufferSource();
+          src.buffer = cbuf;
+          src.connect(applauseFilter);
+          src.start(t);
+        })();
+      }
+
+      /* ---- Crowd "cheer" swell: detuned voice-range oscillators ---- */
+      var cheerMaster = ctx.createGain();
+      cheerMaster.gain.setValueAtTime(0.0001, now);
+      cheerMaster.gain.exponentialRampToValueAtTime(0.38, now + 0.5);
+      cheerMaster.gain.setValueAtTime(0.38, now + 1.3);
+      cheerMaster.gain.exponentialRampToValueAtTime(0.0001, now + 2.4);
+      cheerMaster.connect(ctx.destination);
+
+      var cheerFilter = ctx.createBiquadFilter();
+      cheerFilter.type = 'lowpass';
+      cheerFilter.frequency.value = 1200;
+      cheerFilter.connect(cheerMaster);
+
+      var voiceFreqs = [220, 233, 247, 262, 277, 294, 311, 330, 175, 196];
+      voiceFreqs.forEach(function (freq) {
+        var vOsc = ctx.createOscillator();
+        vOsc.type = 'sawtooth';
+        vOsc.frequency.value = freq * (0.98 + Math.random() * 0.04);
+
+        var vGain = ctx.createGain();
+        vGain.gain.value = 0.06;
+
+        var lfo = ctx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.value = 4 + Math.random() * 3;
+        var lfoGain = ctx.createGain();
+        lfoGain.gain.value = 0.03;
+        lfo.connect(lfoGain);
+        lfoGain.connect(vGain.gain);
+
+        vOsc.connect(vGain);
+        vGain.connect(cheerFilter);
+
+        vOsc.start(now);
+        lfo.start(now);
+        vOsc.stop(now + 2.4);
+        lfo.stop(now + 2.4);
+      });
+    } catch (e) {
+      // Web Audio not supported — fail silently, visuals still work
+      console.warn('Audio not available', e);
+    }
+  }
+
+  /* ---------------- Reveal ---------------- */
+  function reveal() {
+    if (fired) return;
+    fired = true;
+
+    playCelebrationSound();
+    burstConfetti();
+    spawnCelebrationEmojis(22);
+    tapScreen.classList.add('hidden');
+    coupleWrap.classList.add('lit');
+
+    setTimeout(function () {
+      messageScreen.classList.add('visible');
+    }, 400);
+
+    setTimeout(function () {
+      for (var i = 0; i < 35; i++) makeConfettiPiece();
+    }, 1400);
+    
+    setTimeout(function () {
+      spawnCelebrationEmojis(16);
+    }, 1600);
+  }
+
+  tapScreen.addEventListener('click', reveal);
+  tapScreen.addEventListener('touchstart', reveal, { passive: true });
+</script>
+
+</body>
+</html>
